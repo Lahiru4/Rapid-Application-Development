@@ -1,0 +1,65 @@
+{
+  "name": "coffee-shop-backend",
+  "version": "1.0.0",
+  "description": "Coffee Shop E-commerce Backend API with Node.js, Express, and Firebase",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "seed": "node seeds/sampleData.js",
+    "build": "echo 'No build step required for Node.js'",
+    "deploy": "echo 'Add your deployment script here'"
+  },
+  "keywords": [
+    "ecommerce",
+    "coffee-shop",
+    "nodejs",
+    "express",
+    "firebase",
+    "api",
+    "rest",
+    "backend"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0",
+    "dotenv": "^16.3.1",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "firebase-admin": "^11.11.1",
+    "express-validator": "^7.0.1",
+    "express-rate-limit": "^7.1.5",
+    "multer": "^1.4.5-lts.1",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "eslint": "^8.56.0",
+    "eslint-config-node": "^4.1.0",
+    "eslint-plugin-node": "^11.1.0"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/coffee-shop-backend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/coffee-shop-backend/issues"
+  },
+  "homepage": "https://github.com/yourusername/coffee-shop-backend#readme"
+}
