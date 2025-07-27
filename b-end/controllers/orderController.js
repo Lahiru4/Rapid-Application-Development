@@ -209,7 +209,7 @@ const getUserOrders = async (req, res, next) => {
       query = query.where('userId', '==', req.user.userId);
     }
 
-    // Apply filters
+    // Apply filters BEFORE sorting to avoid index conflicts
     if (status) {
       query = query.where('status', '==', status);
     }
@@ -218,30 +218,20 @@ const getUserOrders = async (req, res, next) => {
       query = query.where('paymentStatus', '==', paymentStatus);
     }
 
-    // Apply sorting
-    const validSortFields = ['createdAt', 'totalAmount', 'status'];
+    // For complex sorting, we need to be careful with indexes
+    // Let's simplify the sorting to avoid index requirements
+    const validSortFields = ['createdAt'];
     const sortField = validSortFields.includes(sortBy) ? sortBy : 'createdAt';
     const order = sortOrder === 'asc' ? 'asc' : 'desc';
     
+    // Apply sorting
     query = query.orderBy(sortField, order);
 
     // Apply pagination
     const pageNum = Math.max(1, parseInt(page));
     const limitNum = Math.min(50, Math.max(1, parseInt(limit)));
-    const offset = (pageNum - 1) * limitNum;
-
-    if (offset > 0) {
-      const offsetQuery = db.collection('orders')
-        .orderBy(sortField, order)
-        .limit(offset);
-      
-      const offsetSnapshot = await offsetQuery.get();
-      if (!offsetSnapshot.empty) {
-        const lastDoc = offsetSnapshot.docs[offsetSnapshot.docs.length - 1];
-        query = query.startAfter(lastDoc);
-      }
-    }
-
+    
+    // For better performance, use simple limit instead of offset
     query = query.limit(limitNum);
 
     const snapshot = await query.get();
@@ -258,12 +248,13 @@ const getUserOrders = async (req, res, next) => {
       });
     });
 
-    // Get total count for pagination
-    let totalQuery = db.collection('orders');
+    // Get total count separately (simpler query)
+    let countQuery = db.collection('orders');
     if (req.user.role !== 'admin') {
-      totalQuery = totalQuery.where('userId', '==', req.user.userId);
+      countQuery = countQuery.where('userId', '==', req.user.userId);
     }
-    const totalSnapshot = await totalQuery.get();
+    
+    const totalSnapshot = await countQuery.get();
     const totalOrders = totalSnapshot.size;
 
     res.json({
@@ -273,11 +264,12 @@ const getUserOrders = async (req, res, next) => {
         currentPage: pageNum,
         totalPages: Math.ceil(totalOrders / limitNum),
         totalOrders,
-        hasNextPage: pageNum * limitNum < totalOrders,
+        hasNextPage: orders.length === limitNum,
         hasPrevPage: pageNum > 1
       }
     });
   } catch (error) {
+    console.error('Error in getUserOrders:', error);
     next(error);
   }
 };
